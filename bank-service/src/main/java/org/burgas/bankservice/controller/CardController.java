@@ -5,11 +5,16 @@ import org.burgas.bankservice.dto.CardInit;
 import org.burgas.bankservice.dto.CardRequest;
 import org.burgas.bankservice.dto.CardResponse;
 import org.burgas.bankservice.service.CardService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
+
+import static java.nio.charset.StandardCharsets.*;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.TEXT_PLAIN;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,5 +37,13 @@ public class CardController {
                 .status(OK)
                 .contentType(APPLICATION_JSON)
                 .body(this.cardService.createCard(cardRequest));
+    }
+
+    @PutMapping(value = "/deposit")
+    public ResponseEntity<String> cardDeposit(@RequestBody CardInit cardInit, @RequestParam Double amount) {
+        return ResponseEntity
+                .status(OK)
+                .contentType(new MediaType(TEXT_PLAIN, UTF_8))
+                .body(this.cardService.deposit(cardInit, amount));
     }
 }

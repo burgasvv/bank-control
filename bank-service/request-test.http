@@ -97,7 +97,6 @@ Authorization: Basic admin@gmail.com admin
 ###
 POST /cards/create
 Host: localhost:9000
-X-Csrf-Token: WGNlwn4SHky1UBLFHuMc8VXYDNQgozXSeEvE07v60o8I8muoaQZdpxojLS-YMnH2J84oxGPgIe1Bx1f_Tir3tYOYtO5sy1mf
 Authorization: Basic employee@gmail.com employee
 Content-Type: application/json
 
@@ -119,4 +118,16 @@ Content-Type: application/json
     "number": "4637 7108 7857 8487",
     "validTill": "2028-06-12",
     "code": 715
+}
+
+###
+PUT /cards/deposit?amount=600.0
+Host: localhost:9000
+Content-Type: application/json
+
+{
+    "number": "5336 7834 8205 6020",
+    "validTill": "2028-06-12",
+    "code": 725,
+    "pin": 2356
 }

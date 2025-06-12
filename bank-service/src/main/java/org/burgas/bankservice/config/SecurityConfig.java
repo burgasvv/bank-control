@@ -46,7 +46,8 @@ public class SecurityConfig {
 
                                 .requestMatchers(
                                         "/security/csrf-token",
-                                        "/identities/create"
+                                        "/identities/create",
+                                        "/cards/deposit"
                                 )
                                 .permitAll()
 

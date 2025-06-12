@@ -1,30 +1,21 @@
 package org.burgas.bankservice.decoder;
 
 import lombok.SneakyThrows;
-import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Base64.getDecoder;
 import static java.util.Base64.getEncoder;
 import static javax.crypto.Cipher.*;
 
-@Component
 public final class EncodeHandler {
 
     private final SecretKey secretKey;
 
-    {
-        try {
-            secretKey = KeyGenerator.getInstance("AES").generateKey();
-
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+    public EncodeHandler(SecretKey secretKey) {
+        this.secretKey = secretKey;
     }
 
     @SneakyThrows

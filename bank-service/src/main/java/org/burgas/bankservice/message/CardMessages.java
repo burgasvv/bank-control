@@ -5,7 +5,10 @@ import lombok.Getter;
 @Getter
 public enum CardMessages {
 
+    DEPOSIT_SUCCESS("Deposit successfully done"),
+    WITHDRAW_SUCCESS("Withdraw successfully done"),
     WRONG_PIN_CODE("Wrong pin code, it must be 4 symbols"),
+    WRONG_PIN("Wrong pin code"),
     PIN_EMPTY("Pin data empty"),
     CARD_NOT_FOUND("Card not found"),
     YEARS_EMPTY("Years data are empty"),
