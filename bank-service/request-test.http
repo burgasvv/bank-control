@@ -40,7 +40,6 @@ Content-Type: application/json
 ###
 POST /identities/create
 Host: localhost:9000
-X-Csrf-Token: rTJv7mh8SXRf4OaQtNJtx-QF4TGNTpAY6qt_yzwchIqbyrWylQda3Q1JfUJyg9ahgf9Z9YVnzFC5K_U12J9K-wl4tb6q_YTT
 Content-Type: application/json
 
 {
@@ -98,7 +97,7 @@ Authorization: Basic admin@gmail.com admin
 ###
 POST /cards/create
 Host: localhost:9000
-X-Csrf-Token: rTJv7mh8SXRf4OaQtNJtx-QF4TGNTpAY6qt_yzwchIqbyrWylQda3Q1JfUJyg9ahgf9Z9YVnzFC5K_U12J9K-wl4tb6q_YTT
+X-Csrf-Token: WGNlwn4SHky1UBLFHuMc8VXYDNQgozXSeEvE07v60o8I8muoaQZdpxojLS-YMnH2J84oxGPgIe1Bx1f_Tir3tYOYtO5sy1mf
 Authorization: Basic employee@gmail.com employee
 Content-Type: application/json
 
@@ -106,10 +105,18 @@ Content-Type: application/json
     "identityId": "36c26d47-ff67-47c9-a7ba-1a1d0de6f52b",
     "cardType": "DEBIT",
     "paymentSystem": "MIR",
-    "years": 3
+    "years": 3,
+    "pin": 2356
 }
 
 ###
-GET /cards/by-parameters?identityId=36c26d47-ff67-47c9-a7ba-1a1d0de6f52b&number=2454-7267-5555-5072&validTill=2028-06-12&code=636
+GET /cards/by-parameters?identityId=36c26d47-ff67-47c9-a7ba-1a1d0de6f52b
 Host: localhost:9000
 Authorization: Basic user@gmail.com user
+Content-Type: application/json
+
+{
+    "number": "4637 7108 7857 8487",
+    "validTill": "2028-06-12",
+    "code": 715
+}

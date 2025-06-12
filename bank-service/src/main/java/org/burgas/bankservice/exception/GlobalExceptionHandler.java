@@ -76,4 +76,12 @@ public final class GlobalExceptionHandler {
                 .contentType(new MediaType(TEXT_PLAIN, UTF_8))
                 .body(exception.getMessage());
     }
+
+    @ExceptionHandler(WrongPinCodeException.class)
+    public ResponseEntity<String> handleWrongPinCodeException(WrongPinCodeException exception) {
+        return ResponseEntity
+                .status(NOT_ACCEPTABLE)
+                .contentType(new MediaType(TEXT_PLAIN, UTF_8))
+                .body(exception.getMessage());
+    }
 }

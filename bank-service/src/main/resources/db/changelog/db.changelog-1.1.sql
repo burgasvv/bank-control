@@ -16,3 +16,9 @@ create table if not exists card (
     updated_at timestamp not null
 );
 commit ;
+
+--changeset burgasvv:2
+begin ;
+alter table if exists card add column pin varchar ;
+alter table if exists card alter column pin set not null ;
+commit ;

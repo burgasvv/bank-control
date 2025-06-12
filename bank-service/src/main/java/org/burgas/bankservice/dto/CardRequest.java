@@ -19,5 +19,6 @@ public final class CardRequest extends Request {
     private UUID identityId;
     private CardType cardType;
     private PaymentSystem paymentSystem;
+    private Long pin;
     private Integer years;
 }
