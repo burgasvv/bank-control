@@ -84,4 +84,12 @@ public class IdentityController {
                 .contentType(new MediaType(TEXT_PLAIN, UTF_8))
                 .body(this.identityService.changePassword(identityId, password));
     }
+
+    @PatchMapping(value = "/enable-disable")
+    public ResponseEntity<String> enableOrDisableIdentity(@RequestParam UUID identityId, @RequestParam Boolean enabled) {
+        return ResponseEntity
+                .status(OK)
+                .contentType(new MediaType(TEXT_PLAIN, UTF_8))
+                .body(this.identityService.enableOrDisable(identityId, enabled));
+    }
 }

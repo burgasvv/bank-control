@@ -5,6 +5,10 @@ import lombok.Getter;
 @Getter
 public enum IdentityMessages {
 
+    IDENTITY_SELF_CONTROL("Identity self control detected"),
+    IDENTITY_ENABLED("Identity successfully enabled"),
+    IDENTITY_DISABLED("Identity successfully disabled"),
+    IDENTITY_SAME_DATA("Identity already have same data"),
     IDENTITY_PASSWORD_EMPTY("identity password is empty"),
     IDENTITY_PASSWORD_CHANGED("Identity password was successfully changed"),
     IDENTITY_DELETED("Identity successfully deleted"),

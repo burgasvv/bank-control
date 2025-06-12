@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.burgas.bankservice.dto.IdentityRequest;
 import org.burgas.bankservice.dto.IdentityResponse;
+import org.burgas.bankservice.entity.Identity;
 import org.burgas.bankservice.exception.EmptyIdentityPasswordException;
 import org.burgas.bankservice.exception.IdentityNotFoundException;
+import org.burgas.bankservice.exception.SameIdentityDataException;
 import org.burgas.bankservice.mapper.IdentityMapper;
 import org.burgas.bankservice.repository.IdentityRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -110,6 +112,30 @@ public class IdentityService {
                             identity.setPassword(this.passwordEncoder.encode(newPassword));
                             this.identityRepository.save(identity);
                             return IDENTITY_PASSWORD_CHANGED.getMessage();
+                        }
+                )
+                .findFirst()
+                .orElseThrow(
+                        () -> new IdentityNotFoundException(IDENTITY_NOT_FOUND.getMessage())
+                );
+    }
+
+    @Transactional(
+            isolation = REPEATABLE_READ, propagation = REQUIRED,
+            rollbackFor = Exception.class
+    )
+    public String enableOrDisable(final UUID identityId, final Boolean enabled) {
+        return this.identityRepository.findById(identityId == null ? nameUUIDFromBytes("0".getBytes(UTF_8)) : identityId)
+                .stream()
+                .peek(identity -> log.info(IDENTITY_FOUND_BEFORE_ENABLE_OR_DISABLE.getLog(), identity))
+                .map(
+                        identity -> {
+                            if (identity.getEnabled().equals(enabled))
+                                throw new SameIdentityDataException(IDENTITY_SAME_DATA.getMessage());
+
+                            identity.setEnabled(enabled);
+                            Identity saved = this.identityRepository.save(identity);
+                            return saved.getEnabled() ? IDENTITY_ENABLED.getMessage() : IDENTITY_DISABLED.getMessage();
                         }
                 )
                 .findFirst()

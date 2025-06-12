@@ -57,6 +57,11 @@ public class SecurityConfig {
                                         "/identities"
                                 )
                                 .hasAnyAuthority("ADMIN", "EMPLOYEE")
+
+                                .requestMatchers(
+                                        "/identities/enable-disable"
+                                )
+                                .hasAnyAuthority("ADMIN")
                 )
                 .build();
     }

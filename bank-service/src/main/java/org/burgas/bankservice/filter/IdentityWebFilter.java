@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.burgas.bankservice.entity.Identity;
 import org.burgas.bankservice.exception.IdentityNotAuthenticatedException;
 import org.burgas.bankservice.exception.IdentityNotAuthorizedException;
+import org.burgas.bankservice.exception.IdentitySelfControlException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -16,14 +17,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import static org.burgas.bankservice.message.IdentityMessages.IDENTITY_NOT_AUTHENTICATED;
-import static org.burgas.bankservice.message.IdentityMessages.IDENTITY_NOT_AUTHORIZED;
+import static org.burgas.bankservice.message.IdentityMessages.*;
 
 @WebFilter(
         urlPatterns = {
                 "/identities/by-id", "/identities/by-email",
                 "/identities/update", "/identities/delete",
-                "/identities/change-password"
+                "/identities/change-password", "/identities/enable-disable"
         },
         asyncSupported = true
 )
@@ -71,6 +71,27 @@ public final class IdentityWebFilter extends OncePerRequestFilter {
 
                 } else {
                     throw new IdentityNotAuthorizedException(IDENTITY_NOT_AUTHORIZED.getMessage());
+                }
+
+            } else {
+                throw new IdentityNotAuthenticatedException(IDENTITY_NOT_AUTHENTICATED.getMessage());
+            }
+
+        } else if (request.getRequestURI().equals("/identities/enable-disable")) {
+
+            Authentication authentication = (Authentication) request.getUserPrincipal();
+            String identityIdParam = request.getParameter("identityId");
+
+            if (authentication.isAuthenticated()) {
+                Identity identity = (Identity) authentication.getPrincipal();
+                UUID identityId = identityIdParam == null || identityIdParam.isBlank() ?
+                        UUID.nameUUIDFromBytes("0".getBytes(StandardCharsets.UTF_8)) : UUID.fromString(identityIdParam);
+
+                if (!identity.getId().equals(identityId)) {
+                    filterChain.doFilter(request, response);
+
+                } else {
+                    throw new IdentitySelfControlException(IDENTITY_SELF_CONTROL.getMessage());
                 }
 
             } else {
