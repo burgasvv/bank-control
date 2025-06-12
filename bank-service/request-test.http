@@ -1,0 +1,60 @@
+
+###
+GET /security/csrf-token
+Host: localhost:9000
+
+###
+POST /identities/create
+Host: localhost:9000
+X-Csrf-Token: XRyDD2RtCU19H-IhMmyYKnPbg2FhwJTqa1Jvy_Z2VVQE9LQoOCy6PFVfbS9QLtJDVEGsE0G9rlhT8_HHU2pe8sQSY2U1kYNJ
+Content-Type: application/json
+
+{
+    "authority": "ADMIN",
+    "name": "Igor",
+    "surname": "Polushev",
+    "patronymic": "Petrovich",
+    "password": "admin",
+    "email": "admin@gmail.com",
+    "phone": "+7(913)-905-7556",
+    "passport": "4657 687943",
+    "enabled": true
+}
+
+###
+PUT /identities/update?identityId=acf2d526-b745-465c-b82f-cb07837f361c
+Host: localhost:9000
+X-Csrf-Token: Lfiqm8TxIByfnUyfpmEmVnY6R-ruNRSowPp39vCf_JDwoOjISMiTqPXDRH6yrHz9wEwSb0RcatPcBnGF-MJGz8L7yqHBxd-p
+Authorization: Basic admin@gmail.com admin
+Content-Type: application/json
+
+{
+    "phone": "+7(952)-295-5690"
+}
+
+###
+GET /identities
+Host: localhost:9000
+Authorization: Basic admin@gmail.com admin
+
+###
+GET /identities/by-email?email=admin@gmail.com
+Host: localhost:9000
+Authorization: Basic admin@gmail.com admin
+
+###
+GET /identities/by-id?identityId=acf2d526-b745-465c-b82f-cb07837f361c
+Host: localhost:9000
+Authorization: Basic admin@gmail.com admin
+
+###
+DELETE /identities/delete?identityId=acf2d526-b745-465c-b82f-cb07837f361c
+Host: localhost:9000
+X-Csrf-Token: uqmj4OvTD6xBiY_d8W9feAK8OUMmVUk1-GJ47f8198IeYXks35ma09rha85suL-_l0JrQTDaFHoUZiwYwFpJ1M1RwfMvBE5N
+Authorization: Basic admin@gmail.com admin
+
+###
+PATCH /identities/change-password?identityId=41d8248f-826c-4f78-a818-94bd6c909aaa&password=adminadmin
+Host: localhost:9000
+X-Csrf-Token: XRyDD2RtCU19H-IhMmyYKnPbg2FhwJTqa1Jvy_Z2VVQE9LQoOCy6PFVfbS9QLtJDVEGsE0G9rlhT8_HHU2pe8sQSY2U1kYNJ
+Authorization: Basic admin@gmail.com admin
