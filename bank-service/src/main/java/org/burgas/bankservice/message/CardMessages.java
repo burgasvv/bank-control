@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum CardMessages {
 
+    NOT_ENOUGH_MONEY("Not enough money for withdraw operation"),
     DEPOSIT_SUCCESS("Deposit successfully done"),
     WITHDRAW_SUCCESS("Withdraw successfully done"),
     WRONG_PIN_CODE("Wrong pin code, it must be 4 symbols"),

@@ -2,14 +2,15 @@ package org.burgas.bankservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.burgas.bankservice.decoder.EncodeHandler;
 import org.burgas.bankservice.dto.CardInit;
 import org.burgas.bankservice.dto.CardRequest;
 import org.burgas.bankservice.dto.CardResponse;
 import org.burgas.bankservice.exception.CardNotFoundException;
+import org.burgas.bankservice.exception.NotEnoughMoneyException;
 import org.burgas.bankservice.exception.WrongPinCodeException;
 import org.burgas.bankservice.mapper.CardMapper;
 import org.burgas.bankservice.repository.CardRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +32,7 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final CardMapper cardMapper;
-    private final EncodeHandler encodeHandler;
+    private final PasswordEncoder passwordEncoder;
 
     public CardResponse findByParameters(final CardInit cardInit) {
         return this.cardRepository.findCardByNumberAndValidTillAndCode(
@@ -72,15 +73,46 @@ public class CardService {
         )
                 .map(
                         card -> {
-                            String decodedPinString = this.encodeHandler.decode(card.getPin());
-                            Long decodedPin = Long.parseLong(decodedPinString);
 
-                            if (decodedPin.equals(cardInit.getPin())) {
+                            if (this.passwordEncoder.matches(String.valueOf(cardInit.getPin()), card.getPin())) {
                                 BigDecimal added = card.getMoney().add(BigDecimal.valueOf(amount));
                                 card.setMoney(added);
                                 card.setUpdatedAt(LocalDateTime.now());
                                 this.cardRepository.save(card);
                                 return DEPOSIT_SUCCESS.getMessage();
+
+                            } else {
+                                throw new WrongPinCodeException(WRONG_PIN.getMessage());
+                            }
+                        }
+                )
+                .orElseThrow(
+                        () -> new CardNotFoundException(CARD_NOT_FOUND.getMessage())
+                );
+    }
+
+    @Transactional(
+            isolation = REPEATABLE_READ, propagation = REQUIRED,
+            rollbackFor = Exception.class
+    )
+    public String withdraw(final CardInit cardInit, final Double amount) {
+        return this.cardRepository.findCardByNumberAndValidTillAndCode(
+                        cardInit.getNumber() == null ? "" : cardInit.getNumber(),
+                        cardInit.getValidTill() == null ? LocalDate.of(1,1,1) : cardInit.getValidTill(),
+                        cardInit.getCode() == null ? 0L : cardInit.getCode()
+                )
+                .map(
+                        card -> {
+
+                            if (card.getMoney().doubleValue() < amount && !card.getCardType().name().equals("OVERDRAFT"))
+                                throw new NotEnoughMoneyException(NOT_ENOUGH_MONEY.getMessage());
+
+                            if (this.passwordEncoder.matches(String.valueOf(cardInit.getPin()), card.getPin())) {
+                                BigDecimal added = card.getMoney().subtract(BigDecimal.valueOf(amount));
+                                card.setMoney(added);
+                                card.setUpdatedAt(LocalDateTime.now());
+                                this.cardRepository.save(card);
+                                return WITHDRAW_SUCCESS.getMessage();
 
                             } else {
                                 throw new WrongPinCodeException(WRONG_PIN.getMessage());

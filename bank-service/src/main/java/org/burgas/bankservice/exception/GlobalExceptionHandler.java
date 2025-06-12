@@ -84,4 +84,12 @@ public final class GlobalExceptionHandler {
                 .contentType(new MediaType(TEXT_PLAIN, UTF_8))
                 .body(exception.getMessage());
     }
+
+    @ExceptionHandler(NotEnoughMoneyException.class)
+    public ResponseEntity<String> handleNotEnoughMoneyException(NotEnoughMoneyException exception) {
+        return ResponseEntity
+                .status(NOT_ACCEPTABLE)
+                .contentType(new MediaType(TEXT_PLAIN, UTF_8))
+                .body(exception.getMessage());
+    }
 }

@@ -44,4 +44,12 @@ public class CardController {
                 .contentType(new MediaType(TEXT_PLAIN, UTF_8))
                 .body(this.cardService.deposit(cardInit, amount));
     }
+
+    @PutMapping(value = "/withdraw")
+    public ResponseEntity<String> cardWithdraw(@RequestBody CardInit cardInit, @RequestParam Double amount) {
+        return ResponseEntity
+                .status(OK)
+                .contentType(new MediaType(TEXT_PLAIN, UTF_8))
+                .body(this.cardService.withdraw(cardInit, amount));
+    }
 }

@@ -97,6 +97,7 @@ Authorization: Basic admin@gmail.com admin
 ###
 POST /cards/create
 Host: localhost:9000
+X-Csrf-Token: MBp6s9lWcvSO0fPnCGsY2RpIJhCzh37p_o95SEFOKODOISpwBS1Mhu8zQ5Kj45bQMUYs6iJ9C3GGtUjEn74deHZ_EIb2GUwR
 Authorization: Basic employee@gmail.com employee
 Content-Type: application/json
 
@@ -115,9 +116,9 @@ Authorization: Basic user@gmail.com user
 Content-Type: application/json
 
 {
-    "number": "4637 7108 7857 8487",
+    "number": "7647 7164 5381 8405",
     "validTill": "2028-06-12",
-    "code": 715
+    "code": 216
 }
 
 ###
@@ -126,8 +127,20 @@ Host: localhost:9000
 Content-Type: application/json
 
 {
-    "number": "5336 7834 8205 6020",
+    "number": "7647 7164 5381 8405",
     "validTill": "2028-06-12",
-    "code": 725,
+    "code": 216,
+    "pin": 2356
+}
+
+###
+PUT /cards/withdraw?amount=250.0
+Host: localhost:9000
+Content-Type: application/json
+
+{
+    "number": "7647 7164 5381 8405",
+    "validTill": "2028-06-12",
+    "code": 216,
     "pin": 2356
 }

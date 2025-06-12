@@ -1,13 +1,13 @@
 package org.burgas.bankservice.mapper;
 
 import lombok.RequiredArgsConstructor;
-import org.burgas.bankservice.decoder.EncodeHandler;
 import org.burgas.bankservice.dto.CardIdentity;
 import org.burgas.bankservice.dto.CardRequest;
 import org.burgas.bankservice.dto.CardResponse;
 import org.burgas.bankservice.entity.Card;
 import org.burgas.bankservice.exception.IdentityNotFoundException;
 import org.burgas.bankservice.repository.IdentityRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -26,7 +26,7 @@ import static org.burgas.bankservice.message.IdentityMessages.IDENTITY_NOT_FOUND
 public final class CardMapper implements EntityMapper<CardRequest, Card, CardResponse> {
 
     private final IdentityRepository identityRepository;
-    private final EncodeHandler encodeHandler;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Card toEntity(CardRequest cardRequest) {
@@ -43,7 +43,7 @@ public final class CardMapper implements EntityMapper<CardRequest, Card, CardRes
                                 .validTill(LocalDate.now().plusYears(this.handleDataException(cardRequest.getYears(), YEARS_EMPTY.getMessage())))
                                 .code(this.getCode())
                                 .money(new BigDecimal(0))
-                                .pin(this.encodeHandler.encode(String.valueOf(pin)))
+                                .pin(this.passwordEncoder.encode(String.valueOf(pin)))
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
                                 .build()
