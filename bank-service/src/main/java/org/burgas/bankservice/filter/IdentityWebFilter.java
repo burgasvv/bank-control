@@ -23,7 +23,9 @@ import static org.burgas.bankservice.message.IdentityMessages.*;
         urlPatterns = {
                 "/identities/by-id", "/identities/by-email",
                 "/identities/update", "/identities/delete",
-                "/identities/change-password", "/identities/enable-disable"
+                "/identities/change-password", "/identities/enable-disable",
+
+                "/cards/by-parameters"
         },
         asyncSupported = true
 )
@@ -92,6 +94,31 @@ public final class IdentityWebFilter extends OncePerRequestFilter {
 
                 } else {
                     throw new IdentitySelfControlException(IDENTITY_SELF_CONTROL.getMessage());
+                }
+
+            } else {
+                throw new IdentityNotAuthenticatedException(IDENTITY_NOT_AUTHENTICATED.getMessage());
+            }
+
+        } else if (request.getRequestURI().equals("/cards/by-parameters")) {
+
+            Authentication authentication = (Authentication) request.getUserPrincipal();
+            String identityIdParam = request.getParameter("identityId");
+
+            if (authentication.isAuthenticated()) {
+                Identity identity = (Identity) authentication.getPrincipal();
+                UUID identityId = identityIdParam == null || identityIdParam.isBlank() ?
+                        UUID.nameUUIDFromBytes("0".getBytes(StandardCharsets.UTF_8)) : UUID.fromString(identityIdParam);
+
+                if (
+                        identity.getId().equals(identityId) ||
+                        identity.getAuthority().name().equals("ADMIN") ||
+                        identity.getAuthority().name().equals("EMPLOYEE")
+                ) {
+                    filterChain.doFilter(request, response);
+
+                } else {
+                    throw new IdentityNotAuthorizedException(IDENTITY_NOT_AUTHORIZED.getMessage());
                 }
 
             } else {

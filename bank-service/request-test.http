@@ -38,6 +38,24 @@ Content-Type: application/json
 }
 
 ###
+POST /identities/create
+Host: localhost:9000
+X-Csrf-Token: rTJv7mh8SXRf4OaQtNJtx-QF4TGNTpAY6qt_yzwchIqbyrWylQda3Q1JfUJyg9ahgf9Z9YVnzFC5K_U12J9K-wl4tb6q_YTT
+Content-Type: application/json
+
+{
+    "authority": "EMPLOYEE",
+    "name": "Svetlana",
+    "surname": "Marlova",
+    "patronymic": "Pavlovna",
+    "password": "employee",
+    "email": "employee@gmail.com",
+    "phone": "+7(961)-294-5184",
+    "passport": "8463 765238",
+    "enabled": true
+}
+
+###
 PUT /identities/update?identityId=acf2d526-b745-465c-b82f-cb07837f361c
 Host: localhost:9000
 Authorization: Basic admin@gmail.com admin
@@ -76,3 +94,22 @@ Authorization: Basic admin@gmail.com admin
 PATCH /identities/enable-disable?identityId=36c26d47-ff67-47c9-a7ba-1a1d0de6f52b&enabled=true
 Host: localhost:9000
 Authorization: Basic admin@gmail.com admin
+
+###
+POST /cards/create
+Host: localhost:9000
+X-Csrf-Token: rTJv7mh8SXRf4OaQtNJtx-QF4TGNTpAY6qt_yzwchIqbyrWylQda3Q1JfUJyg9ahgf9Z9YVnzFC5K_U12J9K-wl4tb6q_YTT
+Authorization: Basic employee@gmail.com employee
+Content-Type: application/json
+
+{
+    "identityId": "36c26d47-ff67-47c9-a7ba-1a1d0de6f52b",
+    "cardType": "DEBIT",
+    "paymentSystem": "MIR",
+    "years": 3
+}
+
+###
+GET /cards/by-parameters?identityId=36c26d47-ff67-47c9-a7ba-1a1d0de6f52b&number=2454-7267-5555-5072&validTill=2028-06-12&code=636
+Host: localhost:9000
+Authorization: Basic user@gmail.com user

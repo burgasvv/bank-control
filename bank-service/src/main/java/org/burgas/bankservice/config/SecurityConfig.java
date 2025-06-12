@@ -20,6 +20,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    public static final String ADMIN = "ADMIN";
+    public static final String EMPLOYEE = "EMPLOYEE";
+    public static final String USER = "USER";
+
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailsService customUserDetailsService;
 
@@ -49,19 +53,26 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/identities/by-id", "/identities/by-email",
                                         "/identities/update", "/identities/delete",
-                                        "/identities/change-password"
+                                        "/identities/change-password",
+
+                                        "/cards/by-parameters"
                                 )
-                                .hasAnyAuthority("ADMIN", "EMPLOYEE", "USER")
+                                .hasAnyAuthority(ADMIN, EMPLOYEE, USER)
 
                                 .requestMatchers(
                                         "/identities"
                                 )
-                                .hasAnyAuthority("ADMIN", "EMPLOYEE")
+                                .hasAnyAuthority(ADMIN, EMPLOYEE)
+
+                                .requestMatchers(
+                                        "/cards/create"
+                                )
+                                .hasAnyAuthority(EMPLOYEE)
 
                                 .requestMatchers(
                                         "/identities/enable-disable"
                                 )
-                                .hasAnyAuthority("ADMIN")
+                                .hasAnyAuthority(ADMIN)
                 )
                 .build();
     }
