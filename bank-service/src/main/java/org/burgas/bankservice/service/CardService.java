@@ -3,10 +3,7 @@ package org.burgas.bankservice.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.burgas.bankservice.dto.*;
-import org.burgas.bankservice.entity.Card;
-import org.burgas.bankservice.entity.Operation;
-import org.burgas.bankservice.entity.OperationType;
-import org.burgas.bankservice.entity.Transfer;
+import org.burgas.bankservice.entity.*;
 import org.burgas.bankservice.exception.*;
 import org.burgas.bankservice.log.CardLogs;
 import org.burgas.bankservice.mapper.CardMapper;
@@ -162,7 +159,7 @@ public class CardService {
 
                             if (card.getEnabled()) {
 
-                                if (card.getMoney().doubleValue() < amount.doubleValue() && !card.getCardType().name().equals("OVERDRAFT"))
+                                if (card.getMoney().doubleValue() < amount.doubleValue() && !card.getCardType().equals(CardType.OVERDRAFT))
                                     throw new NotEnoughMoneyException(NOT_ENOUGH_MONEY.getMessage());
 
                                 if (this.passwordEncoder.matches(String.valueOf(cardInit.getPin()), card.getPin())) {
@@ -211,7 +208,7 @@ public class CardService {
                         () -> new CardNotFoundException(CARD_NOT_FOUND.getMessage())
                 );
 
-        if (fromCard.getMoney().doubleValue() < amount.doubleValue() && !fromCard.getCardType().name().equals("OVERDRAFT"))
+        if (fromCard.getMoney().doubleValue() < amount.doubleValue() && !fromCard.getCardType().equals(CardType.OVERDRAFT))
             throw new NotEnoughMoneyException(NOT_ENOUGH_MONEY.getMessage());
 
         if (fromCard.getEnabled()) {

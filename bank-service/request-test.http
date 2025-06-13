@@ -135,7 +135,7 @@ Content-Type: application/json
 }
 
 ###
-PUT /cards/deposit?amount=100.0
+PUT /cards/deposit?amount=350.0
 Host: localhost:9000
 Content-Type: application/json
 
@@ -164,6 +164,26 @@ Host: localhost:9000
 Authorization: Basic user@gmail.com user
 
 ###
+PUT /cards/transfer?fromCardId=b33a7ebb-b92a-483b-b1bc-cdf6d447d774&toCardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b&amount=150.0
+Host: localhost:9000
+Authorization: Basic admin@gmail.com admin
+
+###
 PUT /cards/activate-deactivate?cardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b&enabled=true
 Host: localhost:9000
 Authorization: Basic admin@gmail.com admin
+
+###
+GET /operations/by-card?cardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b
+Host: localhost:9000
+Authorization: Basic user@gmail.com user
+
+###
+GET /operations/by-identity?identityId=36c26d47-ff67-47c9-a7ba-1a1d0de6f52b
+Host: localhost:9000
+Authorization: Basic user@gmail.com user
+
+###
+GET /transfers/by-sender-card?senderCardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b
+Host: localhost:9000
+Authorization: Basic user@gmail.com user

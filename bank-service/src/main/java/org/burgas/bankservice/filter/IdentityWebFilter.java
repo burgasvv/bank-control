@@ -17,9 +17,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.burgas.bankservice.message.CardMessages.CARD_NOT_FOUND;
 import static org.burgas.bankservice.message.IdentityMessages.*;
 
@@ -29,7 +29,11 @@ import static org.burgas.bankservice.message.IdentityMessages.*;
                 "/identities/update", "/identities/delete",
                 "/identities/change-password", "/identities/enable-disable",
 
-                "/cards/by-parameters", "/cards/transfer"
+                "/cards/by-parameters", "/cards/transfer",
+
+                "/operations/by-card", "/operations/by-identity",
+
+                "/transfers/by-sender-card"
         },
         asyncSupported = true
 )
@@ -48,7 +52,8 @@ public final class IdentityWebFilter extends OncePerRequestFilter {
 
         if (
                 request.getRequestURI().equals("/identities/by-id") || request.getRequestURI().equals("/identities/delete") ||
-                request.getRequestURI().equals("/identities/update") || request.getRequestURI().equals("/identities/change-password")
+                request.getRequestURI().equals("/identities/update") || request.getRequestURI().equals("/identities/change-password") ||
+                request.getRequestURI().equals("/operations/by-identity")
         ) {
 
             Authentication authentication = (Authentication) request.getUserPrincipal();
@@ -57,7 +62,7 @@ public final class IdentityWebFilter extends OncePerRequestFilter {
             if (authentication.isAuthenticated()) {
                 Identity identity = (Identity) authentication.getPrincipal();
                 UUID identityId = identityIdParam == null || identityIdParam.isBlank() ?
-                        UUID.nameUUIDFromBytes("0".getBytes(StandardCharsets.UTF_8)) : UUID.fromString(identityIdParam);
+                        UUID.nameUUIDFromBytes("0".getBytes(UTF_8)) : UUID.fromString(identityIdParam);
 
                 if (identity.getId().equals(identityId)) {
                     filterChain.doFilter(request, response);
@@ -97,7 +102,7 @@ public final class IdentityWebFilter extends OncePerRequestFilter {
             if (authentication.isAuthenticated()) {
                 Identity identity = (Identity) authentication.getPrincipal();
                 UUID identityId = identityIdParam == null || identityIdParam.isBlank() ?
-                        UUID.nameUUIDFromBytes("0".getBytes(StandardCharsets.UTF_8)) : UUID.fromString(identityIdParam);
+                        UUID.nameUUIDFromBytes("0".getBytes(UTF_8)) : UUID.fromString(identityIdParam);
 
                 if (!identity.getId().equals(identityId)) {
                     filterChain.doFilter(request, response);
@@ -118,7 +123,7 @@ public final class IdentityWebFilter extends OncePerRequestFilter {
             if (authentication.isAuthenticated()) {
                 Identity identity = (Identity) authentication.getPrincipal();
                 UUID identityId = identityIdParam == null || identityIdParam.isBlank() ?
-                        UUID.nameUUIDFromBytes("0".getBytes(StandardCharsets.UTF_8)) : UUID.fromString(identityIdParam);
+                        UUID.nameUUIDFromBytes("0".getBytes(UTF_8)) : UUID.fromString(identityIdParam);
 
                 if (
                         identity.getId().equals(identityId) ||
@@ -144,10 +149,56 @@ public final class IdentityWebFilter extends OncePerRequestFilter {
 
                 Identity identity = (Identity) authentication.getPrincipal();
                 UUID fromCardId = fromCardIdParam == null || fromCardIdParam.isBlank() ?
-                        UUID.nameUUIDFromBytes("0".getBytes(StandardCharsets.UTF_8)) : UUID.fromString(fromCardIdParam);
+                        UUID.nameUUIDFromBytes("0".getBytes(UTF_8)) : UUID.fromString(fromCardIdParam);
                 Card card = this.cardRepository.findById(fromCardId).orElseThrow(
                         () -> new CardNotFoundException(CARD_NOT_FOUND.getMessage())
                 );
+
+                if (card.getIdentityId().equals(identity.getId())) {
+                    filterChain.doFilter(request, response);
+
+                } else {
+                    throw new IdentityNotAuthorizedException(IDENTITY_NOT_AUTHORIZED.getMessage());
+                }
+
+            } else {
+                throw new IdentityNotAuthenticatedException(IDENTITY_NOT_AUTHENTICATED.getMessage());
+            }
+
+        } else if (request.getRequestURI().equals("/operations/by-card")) {
+
+            Authentication authentication = (Authentication) request.getUserPrincipal();
+            String cardIdParam = request.getParameter("cardId");
+
+            if (authentication.isAuthenticated()) {
+
+                Identity identity = (Identity) authentication.getPrincipal();
+                UUID cardId = cardIdParam == null || cardIdParam.isBlank() ?
+                        UUID.nameUUIDFromBytes("0".getBytes(UTF_8)) : UUID.fromString(cardIdParam);
+                Card card = this.cardRepository.findById(cardId).orElseThrow();
+
+                if (card.getIdentityId().equals(identity.getId())) {
+                    filterChain.doFilter(request, response);
+
+                } else {
+                    throw new IdentityNotAuthorizedException(IDENTITY_NOT_AUTHORIZED.getMessage());
+                }
+
+            } else {
+                throw new IdentityNotAuthenticatedException(IDENTITY_NOT_AUTHENTICATED.getMessage());
+            }
+
+        } else if (request.getRequestURI().equals("/transfers/by-sender-card")) {
+
+            Authentication authentication = (Authentication) request.getUserPrincipal();
+            String senderCardIdParam = request.getParameter("senderCardId");
+
+            if (authentication.isAuthenticated()) {
+
+                Identity identity = (Identity) authentication.getPrincipal();
+                UUID cardId = senderCardIdParam == null || senderCardIdParam.isBlank() ?
+                        UUID.nameUUIDFromBytes("0".getBytes(UTF_8)) : UUID.fromString(senderCardIdParam);
+                Card card = this.cardRepository.findById(cardId).orElseThrow();
 
                 if (card.getIdentityId().equals(identity.getId())) {
                     filterChain.doFilter(request, response);
