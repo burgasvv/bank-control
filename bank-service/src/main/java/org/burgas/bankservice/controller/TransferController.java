@@ -29,4 +29,12 @@ public class TransferController {
                 .contentType(APPLICATION_JSON)
                 .body(this.transferService.findBySenderCardId(senderCardId));
     }
+
+    @GetMapping(value = "/by-identity")
+    public ResponseEntity<List<TransferResponse>> getTransfersByIdentity(@RequestParam UUID identityId) {
+        return ResponseEntity
+                .status(OK)
+                .contentType(APPLICATION_JSON)
+                .body(this.transferService.findByIdentityId(identityId));
+    }
 }

@@ -33,7 +33,7 @@ import static org.burgas.bankservice.message.IdentityMessages.*;
 
                 "/operations/by-card", "/operations/by-identity",
 
-                "/transfers/by-sender-card"
+                "/transfers/by-sender-card", "/transfers/by-identity"
         },
         asyncSupported = true
 )
@@ -53,7 +53,7 @@ public final class IdentityWebFilter extends OncePerRequestFilter {
         if (
                 request.getRequestURI().equals("/identities/by-id") || request.getRequestURI().equals("/identities/delete") ||
                 request.getRequestURI().equals("/identities/update") || request.getRequestURI().equals("/identities/change-password") ||
-                request.getRequestURI().equals("/operations/by-identity")
+                request.getRequestURI().equals("/operations/by-identity") || request.getRequestURI().equals("/transfers/by-identity")
         ) {
 
             Authentication authentication = (Authentication) request.getUserPrincipal();

@@ -62,7 +62,7 @@ public class SecurityConfig {
 
                                         "/operations/by-card", "/operations/by-identity",
 
-                                        "/transfers/by-sender-card"
+                                        "/transfers/by-sender-card", "/transfers/by-identity"
                                 )
                                 .hasAnyAuthority(ADMIN, EMPLOYEE, USER)
 

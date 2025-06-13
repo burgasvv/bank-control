@@ -187,3 +187,8 @@ Authorization: Basic user@gmail.com user
 GET /transfers/by-sender-card?senderCardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b
 Host: localhost:9000
 Authorization: Basic user@gmail.com user
+
+###
+GET /transfers/by-identity?identityId=36c26d47-ff67-47c9-a7ba-1a1d0de6f52b
+Host: localhost:9000
+Authorization: Basic user@gmail.com user
