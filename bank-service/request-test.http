@@ -162,3 +162,8 @@ Content-Type: application/json
 PUT /cards/transfer?fromCardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b&toCardId=b33a7ebb-b92a-483b-b1bc-cdf6d447d774&amount=200.0
 Host: localhost:9000
 Authorization: Basic user@gmail.com user
+
+###
+PUT /cards/activate-deactivate?cardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b&enabled=true
+Host: localhost:9000
+Authorization: Basic admin@gmail.com admin

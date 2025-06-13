@@ -63,4 +63,12 @@ public class CardController {
                 .contentType(new MediaType(TEXT_PLAIN, UTF_8))
                 .body(this.cardService.transfer(fromCardId, toCardId, amount));
     }
+
+    @PutMapping(value = "/activate-deactivate")
+    public ResponseEntity<String> activateDeactivateCard(@RequestParam UUID cardId, @RequestParam Boolean enabled) {
+        return ResponseEntity
+                .status(OK)
+                .contentType(new MediaType(TEXT_PLAIN, UTF_8))
+                .body(this.cardService.activateDeactivate(cardId, enabled));
+    }
 }

@@ -35,6 +35,7 @@ public final class Card extends AbstractEntity implements Serializable {
     private Long code;
     private BigDecimal money;
     private String pin;
+    private Boolean enabled;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

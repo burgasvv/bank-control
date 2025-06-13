@@ -27,3 +27,9 @@ commit ;
 begin ;
 alter table if exists card alter column money type decimal ;
 commit ;
+
+--changeset burgasvv:4
+begin ;
+alter table if exists card add column enabled boolean default true;
+alter table if exists card alter column enabled set not null ;
+commit ;

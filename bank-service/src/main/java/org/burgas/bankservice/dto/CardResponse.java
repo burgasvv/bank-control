@@ -23,6 +23,7 @@ public final class CardResponse extends Response {
     private String validTill;
     private Long code;
     private BigDecimal money;
+    private Boolean enabled;
     private String createdAt;
     private String updatedAt;
 }

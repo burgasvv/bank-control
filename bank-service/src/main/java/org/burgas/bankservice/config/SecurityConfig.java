@@ -63,7 +63,9 @@ public class SecurityConfig {
                                 .hasAnyAuthority(ADMIN, EMPLOYEE, USER)
 
                                 .requestMatchers(
-                                        "/identities"
+                                        "/identities",
+
+                                        "/cards/activate-deactivate"
                                 )
                                 .hasAnyAuthority(ADMIN, EMPLOYEE)
 

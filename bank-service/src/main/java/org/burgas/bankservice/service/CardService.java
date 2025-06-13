@@ -6,10 +6,8 @@ import org.burgas.bankservice.dto.CardInit;
 import org.burgas.bankservice.dto.CardRequest;
 import org.burgas.bankservice.dto.CardResponse;
 import org.burgas.bankservice.entity.Card;
-import org.burgas.bankservice.exception.CardNotFoundException;
-import org.burgas.bankservice.exception.NotEnoughMoneyException;
-import org.burgas.bankservice.exception.NullMoneyAmountOperationException;
-import org.burgas.bankservice.exception.WrongPinCodeException;
+import org.burgas.bankservice.exception.*;
+import org.burgas.bankservice.log.CardLogs;
 import org.burgas.bankservice.mapper.CardMapper;
 import org.burgas.bankservice.repository.CardRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,9 +59,33 @@ public class CardService {
     public CardResponse createCard(final CardRequest cardRequest) {
         if (String.valueOf(cardRequest.getPin()).length() != 4)
             throw new WrongPinCodeException(WRONG_PIN_CODE.getMessage());
+
         return this.cardMapper.toResponse(
                 this.cardRepository.save(this.cardMapper.toEntity(cardRequest))
         );
+    }
+
+    @Transactional(
+            isolation = REPEATABLE_READ, propagation = REQUIRED,
+            rollbackFor = Exception.class
+    )
+    public String activateDeactivate(final UUID cardId, final Boolean enabled) {
+        return this.cardRepository.findById(cardId == null ? nameUUIDFromBytes("0".getBytes(UTF_8)) : cardId)
+                .stream()
+                .peek(card -> log.info(CardLogs.CARD_FOUND_BEFORE_DEACTIVATION.getLog(), card))
+                .map(
+                        card -> {
+
+                            if (card.getEnabled() == enabled)
+                                throw new CardStatusException(CARD_WRONG_STATUS.getMessage());
+
+                            card.setEnabled(enabled);
+                            Card saved = this.cardRepository.save(card);
+                            return saved.getEnabled() ? CARD_ACTIVATED.getMessage() : CARD_DEACTIVATED.getMessage();
+                        }
+                )
+                .findFirst()
+                .orElseThrow(() -> new CardNotFoundException(CARD_NOT_FOUND.getMessage()));
     }
 
     @Transactional(
@@ -82,15 +104,21 @@ public class CardService {
                 .map(
                         card -> {
 
-                            if (this.passwordEncoder.matches(String.valueOf(cardInit.getPin()), card.getPin())) {
-                                BigDecimal added = card.getMoney().add(amount);
-                                card.setMoney(added);
-                                card.setUpdatedAt(LocalDateTime.now());
-                                this.cardRepository.save(card);
-                                return DEPOSIT_SUCCESS.getMessage();
+                            if (card.getEnabled()) {
+
+                                if (this.passwordEncoder.matches(String.valueOf(cardInit.getPin()), card.getPin())) {
+                                    BigDecimal added = card.getMoney().add(amount);
+                                    card.setMoney(added);
+                                    card.setUpdatedAt(LocalDateTime.now());
+                                    this.cardRepository.save(card);
+                                    return DEPOSIT_SUCCESS.getMessage();
+
+                                } else {
+                                    throw new WrongPinCodeException(WRONG_PIN.getMessage());
+                                }
 
                             } else {
-                                throw new WrongPinCodeException(WRONG_PIN.getMessage());
+                                throw new CardNotEnabledException(CARD_NOT_ENABLED.getMessage());
                             }
                         }
                 )
@@ -115,18 +143,24 @@ public class CardService {
                 .map(
                         card -> {
 
-                            if (card.getMoney().doubleValue() < amount.doubleValue() && !card.getCardType().name().equals("OVERDRAFT"))
-                                throw new NotEnoughMoneyException(NOT_ENOUGH_MONEY.getMessage());
+                            if (card.getEnabled()) {
 
-                            if (this.passwordEncoder.matches(String.valueOf(cardInit.getPin()), card.getPin())) {
-                                BigDecimal added = card.getMoney().subtract(amount);
-                                card.setMoney(added);
-                                card.setUpdatedAt(LocalDateTime.now());
-                                this.cardRepository.save(card);
-                                return WITHDRAW_SUCCESS.getMessage();
+                                if (card.getMoney().doubleValue() < amount.doubleValue() && !card.getCardType().name().equals("OVERDRAFT"))
+                                    throw new NotEnoughMoneyException(NOT_ENOUGH_MONEY.getMessage());
+
+                                if (this.passwordEncoder.matches(String.valueOf(cardInit.getPin()), card.getPin())) {
+                                    BigDecimal added = card.getMoney().subtract(amount);
+                                    card.setMoney(added);
+                                    card.setUpdatedAt(LocalDateTime.now());
+                                    this.cardRepository.save(card);
+                                    return WITHDRAW_SUCCESS.getMessage();
+
+                                } else {
+                                    throw new WrongPinCodeException(WRONG_PIN.getMessage());
+                                }
 
                             } else {
-                                throw new WrongPinCodeException(WRONG_PIN.getMessage());
+                                throw new CardNotEnabledException(CARD_NOT_ENABLED.getMessage());
                             }
                         }
                 )
@@ -155,15 +189,25 @@ public class CardService {
         if (fromCard.getMoney().doubleValue() < amount.doubleValue() && !fromCard.getCardType().name().equals("OVERDRAFT"))
             throw new NotEnoughMoneyException(NOT_ENOUGH_MONEY.getMessage());
 
-        BigDecimal subtractFrom = fromCard.getMoney().subtract(amount);
-        fromCard.setMoney(subtractFrom);
-        fromCard.setUpdatedAt(LocalDateTime.now());
-        this.cardRepository.save(fromCard);
+        if (fromCard.getEnabled()) {
+            BigDecimal subtractFrom = fromCard.getMoney().subtract(amount);
+            fromCard.setMoney(subtractFrom);
+            fromCard.setUpdatedAt(LocalDateTime.now());
+            this.cardRepository.save(fromCard);
 
-        BigDecimal addedTo = toCard.getMoney().add(amount);
-        toCard.setMoney(addedTo);
-        toCard.setUpdatedAt(LocalDateTime.now());
-        this.cardRepository.save(toCard);
+        } else {
+            throw new CardNotEnabledException(SENDER_CARD_NOT_ENABLED.getMessage());
+        }
+
+        if (toCard.getEnabled()) {
+            BigDecimal addedTo = toCard.getMoney().add(amount);
+            toCard.setMoney(addedTo);
+            toCard.setUpdatedAt(LocalDateTime.now());
+            this.cardRepository.save(toCard);
+
+        } else {
+            throw new CardNotEnabledException(RECIPIENT_CARD_NOT_ENABLED.getMessage());
+        }
 
         return TRANSFER_OPERATION_SUCCESSFUL.getMessage();
     }
