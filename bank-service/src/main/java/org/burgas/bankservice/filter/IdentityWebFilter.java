@@ -5,10 +5,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.burgas.bankservice.entity.Card;
 import org.burgas.bankservice.entity.Identity;
+import org.burgas.bankservice.exception.CardNotFoundException;
 import org.burgas.bankservice.exception.IdentityNotAuthenticatedException;
 import org.burgas.bankservice.exception.IdentityNotAuthorizedException;
 import org.burgas.bankservice.exception.IdentitySelfControlException;
+import org.burgas.bankservice.repository.CardRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import static org.burgas.bankservice.message.CardMessages.CARD_NOT_FOUND;
 import static org.burgas.bankservice.message.IdentityMessages.*;
 
 @WebFilter(
@@ -25,11 +29,17 @@ import static org.burgas.bankservice.message.IdentityMessages.*;
                 "/identities/update", "/identities/delete",
                 "/identities/change-password", "/identities/enable-disable",
 
-                "/cards/by-parameters"
+                "/cards/by-parameters", "/cards/transfer"
         },
         asyncSupported = true
 )
 public final class IdentityWebFilter extends OncePerRequestFilter {
+
+    private final CardRepository cardRepository;
+
+    public IdentityWebFilter(CardRepository cardRepository) {
+        this.cardRepository = cardRepository;
+    }
 
     @Override
     protected void doFilterInternal(
@@ -115,6 +125,31 @@ public final class IdentityWebFilter extends OncePerRequestFilter {
                         identity.getAuthority().name().equals("ADMIN") ||
                         identity.getAuthority().name().equals("EMPLOYEE")
                 ) {
+                    filterChain.doFilter(request, response);
+
+                } else {
+                    throw new IdentityNotAuthorizedException(IDENTITY_NOT_AUTHORIZED.getMessage());
+                }
+
+            } else {
+                throw new IdentityNotAuthenticatedException(IDENTITY_NOT_AUTHENTICATED.getMessage());
+            }
+
+        } else if (request.getRequestURI().equals("/cards/transfer")) {
+
+            Authentication authentication = (Authentication) request.getUserPrincipal();
+            String fromCardIdParam = request.getParameter("fromCardId");
+
+            if (authentication.isAuthenticated()) {
+
+                Identity identity = (Identity) authentication.getPrincipal();
+                UUID fromCardId = fromCardIdParam == null || fromCardIdParam.isBlank() ?
+                        UUID.nameUUIDFromBytes("0".getBytes(StandardCharsets.UTF_8)) : UUID.fromString(fromCardIdParam);
+                Card card = this.cardRepository.findById(fromCardId).orElseThrow(
+                        () -> new CardNotFoundException(CARD_NOT_FOUND.getMessage())
+                );
+
+                if (card.getIdentityId().equals(identity.getId())) {
                     filterChain.doFilter(request, response);
 
                 } else {

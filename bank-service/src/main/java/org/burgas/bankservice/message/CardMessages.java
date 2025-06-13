@@ -5,6 +5,8 @@ import lombok.Getter;
 @Getter
 public enum CardMessages {
 
+    NULL_MONEY_AMOUNT("Null or 0 money amount for operation"),
+    TRANSFER_OPERATION_SUCCESSFUL("Transfer operation successful"),
     NOT_ENOUGH_MONEY("Not enough money for withdraw operation"),
     DEPOSIT_SUCCESS("Deposit successfully done"),
     WITHDRAW_SUCCESS("Withdraw successfully done"),

@@ -58,7 +58,7 @@ public class SecurityConfig {
                                         "/identities/update", "/identities/delete",
                                         "/identities/change-password",
 
-                                        "/cards/by-parameters"
+                                        "/cards/by-parameters", "/cards/transfer"
                                 )
                                 .hasAnyAuthority(ADMIN, EMPLOYEE, USER)
 

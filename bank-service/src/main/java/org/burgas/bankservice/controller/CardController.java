@@ -9,6 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.UUID;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -38,7 +41,7 @@ public class CardController {
     }
 
     @PutMapping(value = "/deposit")
-    public ResponseEntity<String> cardDeposit(@RequestBody CardInit cardInit, @RequestParam Double amount) {
+    public ResponseEntity<String> cardDeposit(@RequestBody CardInit cardInit, @RequestParam BigDecimal amount) {
         return ResponseEntity
                 .status(OK)
                 .contentType(new MediaType(TEXT_PLAIN, UTF_8))
@@ -46,10 +49,18 @@ public class CardController {
     }
 
     @PutMapping(value = "/withdraw")
-    public ResponseEntity<String> cardWithdraw(@RequestBody CardInit cardInit, @RequestParam Double amount) {
+    public ResponseEntity<String> cardWithdraw(@RequestBody CardInit cardInit, @RequestParam BigDecimal amount) {
         return ResponseEntity
                 .status(OK)
                 .contentType(new MediaType(TEXT_PLAIN, UTF_8))
                 .body(this.cardService.withdraw(cardInit, amount));
+    }
+
+    @PutMapping(value = "/transfer")
+    public ResponseEntity<String> cardTransfer(@RequestParam UUID fromCardId, @RequestParam UUID toCardId, @RequestParam BigDecimal amount) {
+        return ResponseEntity
+                .status(OK)
+                .contentType(new MediaType(TEXT_PLAIN, UTF_8))
+                .body(this.cardService.transfer(fromCardId, toCardId, amount));
     }
 }

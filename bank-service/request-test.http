@@ -97,7 +97,6 @@ Authorization: Basic admin@gmail.com admin
 ###
 POST /cards/create
 Host: localhost:9000
-X-Csrf-Token: MBp6s9lWcvSO0fPnCGsY2RpIJhCzh37p_o95SEFOKODOISpwBS1Mhu8zQ5Kj45bQMUYs6iJ9C3GGtUjEn74deHZ_EIb2GUwR
 Authorization: Basic employee@gmail.com employee
 Content-Type: application/json
 
@@ -107,6 +106,20 @@ Content-Type: application/json
     "paymentSystem": "MIR",
     "years": 3,
     "pin": 2356
+}
+
+###
+POST /cards/create
+Host: localhost:9000
+Authorization: Basic employee@gmail.com employee
+Content-Type: application/json
+
+{
+    "identityId": "72333a49-f56d-4dab-8883-85e8fcd7616b",
+    "cardType": "DEBIT",
+    "paymentSystem": "UNION_PAY",
+    "years": 2,
+    "pin": 1245
 }
 
 ###
@@ -122,7 +135,7 @@ Content-Type: application/json
 }
 
 ###
-PUT /cards/deposit?amount=600.0
+PUT /cards/deposit?amount=100.0
 Host: localhost:9000
 Content-Type: application/json
 
@@ -134,7 +147,7 @@ Content-Type: application/json
 }
 
 ###
-PUT /cards/withdraw?amount=250.0
+PUT /cards/withdraw?amount=300.0
 Host: localhost:9000
 Content-Type: application/json
 
@@ -144,3 +157,8 @@ Content-Type: application/json
     "code": 216,
     "pin": 2356
 }
+
+###
+PUT /cards/transfer?fromCardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b&toCardId=b33a7ebb-b92a-483b-b1bc-cdf6d447d774&amount=200.0
+Host: localhost:9000
+Authorization: Basic user@gmail.com user

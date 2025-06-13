@@ -22,3 +22,8 @@ begin ;
 alter table if exists card add column pin varchar ;
 alter table if exists card alter column pin set not null ;
 commit ;
+
+--changeset burgasvv:3
+begin ;
+alter table if exists card alter column money type decimal ;
+commit ;

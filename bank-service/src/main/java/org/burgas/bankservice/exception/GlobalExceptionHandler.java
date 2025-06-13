@@ -92,4 +92,12 @@ public final class GlobalExceptionHandler {
                 .contentType(new MediaType(TEXT_PLAIN, UTF_8))
                 .body(exception.getMessage());
     }
+
+    @ExceptionHandler(NullMoneyAmountOperationException.class)
+    public ResponseEntity<String> handleNullMoneyAmountOperationException(NullMoneyAmountOperationException exception) {
+        return ResponseEntity
+                .status(NOT_ACCEPTABLE)
+                .contentType(new MediaType(TEXT_PLAIN, UTF_8))
+                .body(exception.getMessage());
+    }
 }
