@@ -1,9 +1,7 @@
 package org.burgas.bankservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.burgas.bankservice.dto.CardInit;
-import org.burgas.bankservice.dto.CardRequest;
-import org.burgas.bankservice.dto.CardResponse;
+import org.burgas.bankservice.dto.*;
 import org.burgas.bankservice.service.CardService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,26 +39,26 @@ public class CardController {
     }
 
     @PutMapping(value = "/deposit")
-    public ResponseEntity<String> cardDeposit(@RequestBody CardInit cardInit, @RequestParam BigDecimal amount) {
+    public ResponseEntity<OperationResponse> cardDeposit(@RequestBody CardInit cardInit, @RequestParam BigDecimal amount) {
         return ResponseEntity
                 .status(OK)
-                .contentType(new MediaType(TEXT_PLAIN, UTF_8))
+                .contentType(APPLICATION_JSON)
                 .body(this.cardService.deposit(cardInit, amount));
     }
 
     @PutMapping(value = "/withdraw")
-    public ResponseEntity<String> cardWithdraw(@RequestBody CardInit cardInit, @RequestParam BigDecimal amount) {
+    public ResponseEntity<OperationResponse> cardWithdraw(@RequestBody CardInit cardInit, @RequestParam BigDecimal amount) {
         return ResponseEntity
                 .status(OK)
-                .contentType(new MediaType(TEXT_PLAIN, UTF_8))
+                .contentType(APPLICATION_JSON)
                 .body(this.cardService.withdraw(cardInit, amount));
     }
 
     @PutMapping(value = "/transfer")
-    public ResponseEntity<String> cardTransfer(@RequestParam UUID fromCardId, @RequestParam UUID toCardId, @RequestParam BigDecimal amount) {
+    public ResponseEntity<TransferResponse> cardTransfer(@RequestParam UUID fromCardId, @RequestParam UUID toCardId, @RequestParam BigDecimal amount) {
         return ResponseEntity
                 .status(OK)
-                .contentType(new MediaType(TEXT_PLAIN, UTF_8))
+                .contentType(APPLICATION_JSON)
                 .body(this.cardService.transfer(fromCardId, toCardId, amount));
     }
 

@@ -2,14 +2,19 @@ package org.burgas.bankservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.burgas.bankservice.dto.CardInit;
-import org.burgas.bankservice.dto.CardRequest;
-import org.burgas.bankservice.dto.CardResponse;
+import org.burgas.bankservice.dto.*;
 import org.burgas.bankservice.entity.Card;
+import org.burgas.bankservice.entity.Operation;
+import org.burgas.bankservice.entity.OperationType;
+import org.burgas.bankservice.entity.Transfer;
 import org.burgas.bankservice.exception.*;
 import org.burgas.bankservice.log.CardLogs;
 import org.burgas.bankservice.mapper.CardMapper;
+import org.burgas.bankservice.mapper.OperationMapper;
+import org.burgas.bankservice.mapper.TransferMapper;
 import org.burgas.bankservice.repository.CardRepository;
+import org.burgas.bankservice.repository.OperationRepository;
+import org.burgas.bankservice.repository.TransferRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +41,10 @@ public class CardService {
     private final CardRepository cardRepository;
     private final CardMapper cardMapper;
     private final PasswordEncoder passwordEncoder;
+    private final OperationRepository operationRepository;
+    private final OperationMapper operationMapper;
+    private final TransferRepository transferRepository;
+    private final TransferMapper transferMapper;
 
     public CardResponse findByParameters(final CardInit cardInit) {
         return this.cardRepository.findCardByNumberAndValidTillAndCode(
@@ -92,7 +101,7 @@ public class CardService {
             isolation = REPEATABLE_READ, propagation = REQUIRED,
             rollbackFor = Exception.class
     )
-    public String deposit(final CardInit cardInit, final BigDecimal amount) {
+    public OperationResponse deposit(final CardInit cardInit, final BigDecimal amount) {
         if (amount == null || amount.doubleValue() == 0.0)
             throw new NullMoneyAmountOperationException(NULL_MONEY_AMOUNT.getMessage());
 
@@ -110,8 +119,16 @@ public class CardService {
                                     BigDecimal added = card.getMoney().add(amount);
                                     card.setMoney(added);
                                     card.setUpdatedAt(LocalDateTime.now());
-                                    this.cardRepository.save(card);
-                                    return DEPOSIT_SUCCESS.getMessage();
+                                    Card saved = this.cardRepository.save(card);
+                                    Operation operation = this.operationRepository.save(
+                                            Operation.builder()
+                                                    .cardId(saved.getId())
+                                                    .operationType(OperationType.DEPOSIT)
+                                                    .money(amount)
+                                                    .completedAt(LocalDateTime.now())
+                                                    .build()
+                                    );
+                                    return this.operationMapper.toResponse(operation);
 
                                 } else {
                                     throw new WrongPinCodeException(WRONG_PIN.getMessage());
@@ -131,7 +148,7 @@ public class CardService {
             isolation = REPEATABLE_READ, propagation = REQUIRED,
             rollbackFor = Exception.class
     )
-    public String withdraw(final CardInit cardInit, final BigDecimal amount) {
+    public OperationResponse withdraw(final CardInit cardInit, final BigDecimal amount) {
         if (amount == null || amount.doubleValue() == 0.0)
             throw new NullMoneyAmountOperationException(NULL_MONEY_AMOUNT.getMessage());
 
@@ -152,8 +169,16 @@ public class CardService {
                                     BigDecimal added = card.getMoney().subtract(amount);
                                     card.setMoney(added);
                                     card.setUpdatedAt(LocalDateTime.now());
-                                    this.cardRepository.save(card);
-                                    return WITHDRAW_SUCCESS.getMessage();
+                                    Card saved = this.cardRepository.save(card);
+                                    Operation operation = this.operationRepository.save(
+                                            Operation.builder()
+                                                    .cardId(saved.getId())
+                                                    .operationType(OperationType.WITHDRAW)
+                                                    .money(amount)
+                                                    .completedAt(LocalDateTime.now())
+                                                    .build()
+                                    );
+                                    return this.operationMapper.toResponse(operation);
 
                                 } else {
                                     throw new WrongPinCodeException(WRONG_PIN.getMessage());
@@ -173,7 +198,7 @@ public class CardService {
             isolation = REPEATABLE_READ, propagation = REQUIRED,
             rollbackFor = Exception.class
     )
-    public String transfer(final UUID fromCardId, final UUID toCardId, final BigDecimal amount) {
+    public TransferResponse transfer(final UUID fromCardId, final UUID toCardId, final BigDecimal amount) {
         if (amount == null || amount.doubleValue() == 0.0)
             throw new NullMoneyAmountOperationException(NULL_MONEY_AMOUNT.getMessage());
 
@@ -209,6 +234,14 @@ public class CardService {
             throw new CardNotEnabledException(RECIPIENT_CARD_NOT_ENABLED.getMessage());
         }
 
-        return TRANSFER_OPERATION_SUCCESSFUL.getMessage();
+        Transfer transfer = this.transferRepository.save(
+                Transfer.builder()
+                        .senderId(fromCard.getId())
+                        .recipientId(toCard.getId())
+                        .money(amount)
+                        .completedAt(LocalDateTime.now())
+                        .build()
+        );
+        return this.transferMapper.toResponse(transfer);
     }
 }
