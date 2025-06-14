@@ -4,6 +4,7 @@ import lombok.*;
 import org.burgas.bankservice.entity.CardType;
 import org.burgas.bankservice.entity.PaymentSystem;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -21,4 +22,5 @@ public final class CardRequest extends Request {
     private PaymentSystem paymentSystem;
     private Long pin;
     private Integer years;
+    private BigDecimal money;
 }

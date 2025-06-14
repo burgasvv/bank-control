@@ -12,6 +12,7 @@ import org.burgas.bankservice.mapper.TransferMapper;
 import org.burgas.bankservice.repository.CardRepository;
 import org.burgas.bankservice.repository.OperationRepository;
 import org.burgas.bankservice.repository.TransferRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +21,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.UUID.nameUUIDFromBytes;
 import static org.burgas.bankservice.log.CardLogs.CARD_FOUND_BY_NUMBER_VALID_CODE;
 import static org.burgas.bankservice.message.CardMessages.*;
+import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
 import static org.springframework.transaction.annotation.Isolation.REPEATABLE_READ;
 import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 import static org.springframework.transaction.annotation.Propagation.SUPPORTS;
@@ -42,6 +45,20 @@ public class CardService {
     private final OperationMapper operationMapper;
     private final TransferRepository transferRepository;
     private final TransferMapper transferMapper;
+
+    @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 1)
+    @Transactional(isolation = READ_COMMITTED, propagation = REQUIRED, rollbackFor = Exception.class)
+    public void scheduleCardValid() {
+        this.cardRepository.findAll().forEach(
+                card -> {
+                    LocalDate now = LocalDate.now();
+                    if (now.isAfter(card.getValidTill())) {
+                        card.setEnabled(false);
+                        this.cardRepository.save(card);
+                    }
+                }
+        );
+    }
 
     public CardResponse findByParameters(final CardInit cardInit) {
         return this.cardRepository.findCardByNumberAndValidTillAndCode(

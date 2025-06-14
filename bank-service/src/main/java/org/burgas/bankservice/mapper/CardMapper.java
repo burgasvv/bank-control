@@ -5,6 +5,7 @@ import org.burgas.bankservice.dto.CardIdentity;
 import org.burgas.bankservice.dto.CardRequest;
 import org.burgas.bankservice.dto.CardResponse;
 import org.burgas.bankservice.entity.Card;
+import org.burgas.bankservice.entity.CardType;
 import org.burgas.bankservice.exception.IdentityNotFoundException;
 import org.burgas.bankservice.repository.IdentityRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +31,7 @@ public final class CardMapper implements EntityMapper<CardRequest, Card, CardRes
 
     @Override
     public Card toEntity(CardRequest cardRequest) {
-        Long pin = this.handleDataException(cardRequest.getPin(), "Empty pin field");
+        Long pin = this.handleDataException(cardRequest.getPin(), PIN_EMPTY.getMessage());
         return this.identityRepository.findById(
                 cardRequest.getIdentityId() == null ? nameUUIDFromBytes("0".getBytes(UTF_8)) : cardRequest.getIdentityId()
         )
@@ -42,7 +43,10 @@ public final class CardMapper implements EntityMapper<CardRequest, Card, CardRes
                                 .number(this.getNumber())
                                 .validTill(LocalDate.now().plusYears(this.handleDataException(cardRequest.getYears(), YEARS_EMPTY.getMessage())))
                                 .code(this.getCode())
-                                .money(new BigDecimal(0))
+                                .money(
+                                        cardRequest.getCardType().equals(CardType.CREDIT) ||cardRequest.getCardType().equals(CardType.PREPAID) ?
+                                                cardRequest.getMoney() == null ? new BigDecimal(0) : cardRequest.getMoney() : new BigDecimal(0)
+                                )
                                 .pin(this.passwordEncoder.encode(String.valueOf(pin)))
                                 .enabled(true)
                                 .createdAt(LocalDateTime.now())
