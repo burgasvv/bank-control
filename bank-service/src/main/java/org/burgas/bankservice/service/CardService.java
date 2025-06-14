@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.burgas.bankservice.dto.*;
 import org.burgas.bankservice.entity.*;
 import org.burgas.bankservice.exception.*;
-import org.burgas.bankservice.log.CardLogs;
 import org.burgas.bankservice.mapper.CardMapper;
 import org.burgas.bankservice.mapper.OperationMapper;
 import org.burgas.bankservice.mapper.TransferMapper;
@@ -25,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.UUID.nameUUIDFromBytes;
+import static org.burgas.bankservice.log.CardLogs.CARD_FOUND_BEFORE_DEACTIVATION;
 import static org.burgas.bankservice.log.CardLogs.CARD_FOUND_BY_NUMBER_VALID_CODE;
 import static org.burgas.bankservice.message.CardMessages.*;
 import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
@@ -76,7 +76,7 @@ public class CardService {
     }
 
     @Transactional(
-            isolation = REPEATABLE_READ, propagation = REQUIRED,
+            isolation = READ_COMMITTED, propagation = REQUIRED,
             rollbackFor = Exception.class
     )
     public CardResponse createCard(final CardRequest cardRequest) {
@@ -95,7 +95,7 @@ public class CardService {
     public String activateDeactivate(final UUID cardId, final Boolean enabled) {
         return this.cardRepository.findById(cardId == null ? nameUUIDFromBytes("0".getBytes(UTF_8)) : cardId)
                 .stream()
-                .peek(card -> log.info(CardLogs.CARD_FOUND_BEFORE_DEACTIVATION.getLog(), card))
+                .peek(card -> log.info(CARD_FOUND_BEFORE_DEACTIVATION.getLog(), card))
                 .map(
                         card -> {
 
