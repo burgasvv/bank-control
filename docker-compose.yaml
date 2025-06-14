@@ -1,0 +1,25 @@
+
+services:
+
+  bank-service-postgres:
+    image: postgres:latest
+    container_name: bank_service_postgres
+    ports:
+      - "6000:5432"
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bank_service_db
+      PGDATA: /var/lib/data/postgresql
+
+  bank-service:
+    build:
+      context: bank-service
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    depends_on:
+      - bank-service-postgres
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://bank-service-postgres:5432/bank_service_db
