@@ -3,6 +3,10 @@
 GET /security/csrf-token
 Host: localhost:9000
 
+
+### IdentityRequests
+
+
 ###
 POST /identities/create
 Host: localhost:9000
@@ -94,6 +98,10 @@ PATCH /identities/enable-disable?identityId=36c26d47-ff67-47c9-a7ba-1a1d0de6f52b
 Host: localhost:9000
 Authorization: Basic admin@gmail.com admin
 
+
+### Card Requests
+
+
 ###
 POST /cards/create
 Host: localhost:9000
@@ -101,7 +109,7 @@ Authorization: Basic employee@gmail.com employee
 Content-Type: application/json
 
 {
-    "identityId": "36c26d47-ff67-47c9-a7ba-1a1d0de6f52b",
+    "identityId": "cbe85795-7782-41d3-9e4a-8b290ba5aa98",
     "cardType": "DEBIT",
     "paymentSystem": "MIR",
     "years": 3,
@@ -115,7 +123,7 @@ Authorization: Basic employee@gmail.com employee
 Content-Type: application/json
 
 {
-    "identityId": "72333a49-f56d-4dab-8883-85e8fcd7616b",
+    "identityId": "7a5be6cf-a722-4af9-a937-f3711b2ec298",
     "cardType": "DEBIT",
     "paymentSystem": "UNION_PAY",
     "years": 2,
@@ -123,26 +131,26 @@ Content-Type: application/json
 }
 
 ###
-GET /cards/by-parameters?identityId=36c26d47-ff67-47c9-a7ba-1a1d0de6f52b
+GET /cards/by-parameters?identityId=cbe85795-7782-41d3-9e4a-8b290ba5aa98
 Host: localhost:9000
 Authorization: Basic user@gmail.com user
 Content-Type: application/json
 
 {
-    "number": "7647 7164 5381 8405",
-    "validTill": "2028-06-12",
-    "code": 216
+    "number": "7241 2543 3505 6864",
+    "validTill": "2028-06-16",
+    "code": 847
 }
 
 ###
-PUT /cards/deposit?amount=350.0
+PUT /cards/deposit?amount=2300.0
 Host: localhost:9000
 Content-Type: application/json
 
 {
-    "number": "7647 7164 5381 8405",
-    "validTill": "2028-06-12",
-    "code": 216,
+    "number": "7241 2543 3505 6864",
+    "validTill": "2028-06-16",
+    "code": 847,
     "pin": 2356
 }
 
@@ -152,19 +160,19 @@ Host: localhost:9000
 Content-Type: application/json
 
 {
-    "number": "7647 7164 5381 8405",
-    "validTill": "2028-06-12",
-    "code": 216,
+    "number": "7241 2543 3505 6864",
+    "validTill": "2028-06-16",
+    "code": 847,
     "pin": 2356
 }
 
 ###
-PUT /cards/transfer?fromCardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b&toCardId=b33a7ebb-b92a-483b-b1bc-cdf6d447d774&amount=150.0
+PUT /cards/transfer?fromCardId=f4f9d2cd-1d65-41d0-ab89-9f647b7006e7&toCardId=d6e8dcdc-0433-45a7-b787-e53d4f0f4506&amount=500.0
 Host: localhost:9000
 Authorization: Basic user@gmail.com user
 
 ###
-PUT /cards/transfer?fromCardId=b33a7ebb-b92a-483b-b1bc-cdf6d447d774&toCardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b&amount=150.0
+PUT /cards/transfer?fromCardId=d6e8dcdc-0433-45a7-b787-e53d4f0f4506&toCardId=f4f9d2cd-1d65-41d0-ab89-9f647b7006e7&amount=300.0
 Host: localhost:9000
 Authorization: Basic admin@gmail.com admin
 
@@ -173,22 +181,30 @@ PUT /cards/activate-deactivate?cardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b&enabl
 Host: localhost:9000
 Authorization: Basic admin@gmail.com admin
 
+
+### Operation Requests
+
+
 ###
-GET /operations/by-card?cardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b
+GET /operations/by-card?cardId=f4f9d2cd-1d65-41d0-ab89-9f647b7006e7
 Host: localhost:9000
 Authorization: Basic user@gmail.com user
 
 ###
-GET /operations/by-identity?identityId=36c26d47-ff67-47c9-a7ba-1a1d0de6f52b
+GET /operations/by-identity?identityId=cbe85795-7782-41d3-9e4a-8b290ba5aa98
+Host: localhost:9000
+Authorization: Basic user@gmail.com user
+
+
+### Transfer Requests
+
+
+###
+GET /transfers/by-sender-card?senderCardId=f4f9d2cd-1d65-41d0-ab89-9f647b7006e7
 Host: localhost:9000
 Authorization: Basic user@gmail.com user
 
 ###
-GET /transfers/by-sender-card?senderCardId=7826aa63-18cf-4b5b-87f6-ec9b88c8b42b
-Host: localhost:9000
-Authorization: Basic user@gmail.com user
-
-###
-GET /transfers/by-identity?identityId=36c26d47-ff67-47c9-a7ba-1a1d0de6f52b
+GET /transfers/by-identity?identityId=cbe85795-7782-41d3-9e4a-8b290ba5aa98
 Host: localhost:9000
 Authorization: Basic user@gmail.com user
