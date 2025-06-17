@@ -55,7 +55,7 @@ public final class IdentityMapper implements EntityMapper<IdentityRequest, Ident
                                 .password(this.handleDataException(this.passwordEncoder.encode(password), IDENTITY_EMPTY_PASSWORD.getMessage()))
                                 .email(this.handleDataException(identityRequest.getEmail(), IDENTITY_EMPTY_EMAIL.getMessage()))
                                 .phone(this.handleDataException(identityRequest.getPhone(), IDENTITY_EMPTY_PHONE.getMessage()))
-                                .passport(this.handleDataException(identityRequest.getPassword(), IDENTITY_EMPTY_PASSPORT.getMessage()))
+                                .passport(this.handleDataException(identityRequest.getPassport(), IDENTITY_EMPTY_PASSPORT.getMessage()))
                                 .enabled(this.handleDataException(identityRequest.getEnabled(), IDENTITY_EMPTY_ENABLED.getMessage()))
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
