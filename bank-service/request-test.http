@@ -109,7 +109,7 @@ Authorization: Basic employee@gmail.com employee
 Content-Type: application/json
 
 {
-    "identityId": "cbe85795-7782-41d3-9e4a-8b290ba5aa98",
+    "identityId": "34aa8030-de24-454d-b979-9c9b95fefbff",
     "cardType": "DEBIT",
     "paymentSystem": "MIR",
     "years": 3,
@@ -123,7 +123,7 @@ Authorization: Basic employee@gmail.com employee
 Content-Type: application/json
 
 {
-    "identityId": "7a5be6cf-a722-4af9-a937-f3711b2ec298",
+    "identityId": "2a88d768-4f13-4118-976f-c81e6d71b93c",
     "cardType": "DEBIT",
     "paymentSystem": "UNION_PAY",
     "years": 2,
@@ -131,15 +131,15 @@ Content-Type: application/json
 }
 
 ###
-GET /cards/by-parameters?identityId=cbe85795-7782-41d3-9e4a-8b290ba5aa98
+GET /cards/by-parameters?identityId=34aa8030-de24-454d-b979-9c9b95fefbff
 Host: localhost:9000
 Authorization: Basic user@gmail.com user
 Content-Type: application/json
 
 {
-    "number": "7241 2543 3505 6864",
-    "validTill": "2028-06-16",
-    "code": 847
+    "number": "0625 1841 4802 2651",
+    "validTill": "2028-06-17",
+    "code": 337
 }
 
 ###
@@ -148,9 +148,9 @@ Host: localhost:9000
 Content-Type: application/json
 
 {
-    "number": "7241 2543 3505 6864",
-    "validTill": "2028-06-16",
-    "code": 847,
+    "number": "0625 1841 4802 2651",
+    "validTill": "2028-06-17",
+    "code": 337,
     "pin": 2356
 }
 
@@ -160,14 +160,14 @@ Host: localhost:9000
 Content-Type: application/json
 
 {
-    "number": "7241 2543 3505 6864",
-    "validTill": "2028-06-16",
-    "code": 847,
+    "number": "0625 1841 4802 2651",
+    "validTill": "2028-06-17",
+    "code": 337,
     "pin": 2356
 }
 
 ###
-PUT /cards/transfer?fromCardId=f4f9d2cd-1d65-41d0-ab89-9f647b7006e7&toCardId=d6e8dcdc-0433-45a7-b787-e53d4f0f4506&amount=500.0
+PUT /cards/transfer?fromCardId=cce03ff2-8f6b-47c7-bb2a-a99479fe38c6&toCardId=40603905-a529-47fe-ace2-47c6f40f973e&amount=1000.0
 Host: localhost:9000
 Authorization: Basic user@gmail.com user
 

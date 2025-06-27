@@ -209,18 +209,18 @@ public class CardService {
     }
 
     @Transactional(
-            isolation = REPEATABLE_READ, propagation = REQUIRED,
+            isolation = READ_COMMITTED, propagation = REQUIRED,
             rollbackFor = Exception.class
     )
     public TransferResponse transfer(final UUID fromCardId, final UUID toCardId, final BigDecimal amount) {
         if (amount == null || amount.doubleValue() == 0.0)
             throw new NullMoneyAmountOperationException(NULL_MONEY_AMOUNT.getMessage());
 
-        Card fromCard = this.cardRepository.findById(fromCardId == null ? nameUUIDFromBytes("0".getBytes(UTF_8)) : fromCardId)
+        Card fromCard = this.cardRepository.findByIdPessimisticWriteMode(fromCardId == null ? nameUUIDFromBytes("0".getBytes(UTF_8)) : fromCardId)
                 .orElseThrow(
                         () -> new CardNotFoundException(CARD_NOT_FOUND.getMessage())
                 );
-        Card toCard = this.cardRepository.findById(toCardId == null ? nameUUIDFromBytes("0".getBytes(UTF_8)) : toCardId)
+        Card toCard = this.cardRepository.findByIdPessimisticWriteMode(toCardId == null ? nameUUIDFromBytes("0".getBytes(UTF_8)) : toCardId)
                 .orElseThrow(
                         () -> new CardNotFoundException(CARD_NOT_FOUND.getMessage())
                 );
