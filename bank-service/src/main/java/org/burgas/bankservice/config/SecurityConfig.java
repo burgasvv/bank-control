@@ -58,7 +58,7 @@ public class SecurityConfig {
                                         "/identities/update", "/identities/delete",
                                         "/identities/change-password",
 
-                                        "/cards/by-parameters", "/cards/transfer",
+                                        "/cards/by-identity", "/cards/by-parameters", "/cards/transfer",
 
                                         "/operations/by-card", "/operations/by-identity",
 

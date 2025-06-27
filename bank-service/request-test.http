@@ -103,6 +103,11 @@ Authorization: Basic admin@gmail.com admin
 
 
 ###
+GET /cards/by-identity?identityId=34aa8030-de24-454d-b979-9c9b95fefbff
+Host: localhost:9000
+Authorization: Basic user@gmail.com user
+
+###
 POST /cards/create
 Host: localhost:9000
 Authorization: Basic employee@gmail.com employee

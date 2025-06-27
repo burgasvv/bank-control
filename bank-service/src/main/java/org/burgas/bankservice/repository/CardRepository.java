@@ -1,5 +1,6 @@
 package org.burgas.bankservice.repository;
 
+import jakarta.persistence.LockModeType;
 import org.burgas.bankservice.entity.Card;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 
 @Repository
 public interface CardRepository extends JpaRepository<Card, UUID> {
@@ -20,7 +20,7 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
 
     List<Card> findCardsByIdentityId(UUID identityId);
 
-    @Lock(PESSIMISTIC_WRITE)
+    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
     @Query(
             value = """
                     select c from Card c where c.id = :cardId

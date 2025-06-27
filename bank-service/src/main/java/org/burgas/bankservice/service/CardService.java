@@ -19,13 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.UUID.nameUUIDFromBytes;
-import static org.burgas.bankservice.log.CardLogs.CARD_FOUND_BEFORE_DEACTIVATION;
-import static org.burgas.bankservice.log.CardLogs.CARD_FOUND_BY_NUMBER_VALID_CODE;
+import static org.burgas.bankservice.log.CardLogs.*;
 import static org.burgas.bankservice.message.CardMessages.*;
 import static org.springframework.transaction.annotation.Isolation.READ_COMMITTED;
 import static org.springframework.transaction.annotation.Isolation.REPEATABLE_READ;
@@ -45,6 +46,14 @@ public class CardService {
     private final OperationMapper operationMapper;
     private final TransferRepository transferRepository;
     private final TransferMapper transferMapper;
+
+    public List<CardResponse> findByIdentityId(final UUID identityId) {
+        return this.cardRepository.findCardsByIdentityId(identityId == null ? UUID.nameUUIDFromBytes("0".getBytes(UTF_8)) : identityId)
+                .parallelStream()
+                .peek(card -> log.info(CARD_FOUND_BY_IDENTITY_ID.getLog(), card))
+                .map(this.cardMapper::toResponse)
+                .collect(Collectors.toList());
+    }
 
     @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 1)
     @Transactional(isolation = READ_COMMITTED, propagation = REQUIRED, rollbackFor = Exception.class)

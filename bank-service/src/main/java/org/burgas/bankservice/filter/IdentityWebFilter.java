@@ -29,7 +29,7 @@ import static org.burgas.bankservice.message.IdentityMessages.*;
                 "/identities/update", "/identities/delete",
                 "/identities/change-password", "/identities/enable-disable",
 
-                "/cards/by-parameters", "/cards/transfer",
+                "/cards/by-identity", "/cards/by-parameters", "/cards/transfer",
 
                 "/operations/by-card", "/operations/by-identity",
 
@@ -115,7 +115,7 @@ public final class IdentityWebFilter extends OncePerRequestFilter {
                 throw new IdentityNotAuthenticatedException(IDENTITY_NOT_AUTHENTICATED.getMessage());
             }
 
-        } else if (request.getRequestURI().equals("/cards/by-parameters")) {
+        } else if (request.getRequestURI().equals("/cards/by-parameters") || request.getRequestURI().equals("/cards/by-identity")) {
 
             Authentication authentication = (Authentication) request.getUserPrincipal();
             String identityIdParam = request.getParameter("identityId");

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -21,6 +22,14 @@ import static org.springframework.http.MediaType.TEXT_PLAIN;
 public class CardController {
 
     private final CardService cardService;
+
+    @GetMapping(value = "/by-identity")
+    public ResponseEntity<List<CardResponse>> getAllCardsByIdentity(@RequestParam UUID identityId) {
+        return ResponseEntity
+                .status(OK)
+                .contentType(APPLICATION_JSON)
+                .body(this.cardService.findByIdentityId(identityId));
+    }
 
     @GetMapping(value = "/by-parameters")
     public ResponseEntity<CardResponse> findCardByParameters(@RequestBody CardInit cardInit) {
