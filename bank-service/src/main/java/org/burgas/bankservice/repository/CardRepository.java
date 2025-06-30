@@ -21,10 +21,6 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
     List<Card> findCardsByIdentityId(UUID identityId);
 
     @Lock(value = LockModeType.PESSIMISTIC_WRITE)
-    @Query(
-            value = """
-                    select c from Card c where c.id = :cardId
-                    """
-    )
+    @Query(value = "select c from Card c where c.id = :cardId")
     Optional<Card> findByIdPessimisticWriteMode(UUID cardId);
 }
